@@ -1,7 +1,7 @@
 const runtimeParams = new URLSearchParams(window.location.search);
 const runtimeBackendUrl = (runtimeParams.get('backend') || '').trim().replace(/\/$/, '');
 //const socketUrl = runtimeBackendUrl || window.location.origin;
-const socketUrl = 'http://54.75.51.181:3000';
+const socketUrl = 'https://a3866e8103b915.lhr.life';
 const socket = io(socketUrl);
 
 const peers = new Map();

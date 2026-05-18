@@ -11,7 +11,7 @@ const io = new Server(server, {
   },
 });
 
-const PORT = 80;
+const PORT = 443;
 
 function parseCsv(value) {
   if (!value) {
@@ -50,7 +50,7 @@ function buildIceServers() {
 }
 
 const appConfig = {
-  baseUrl: 'http://54.75.51.181',
+  baseUrl: 'https://54.75.51.181',
   iceServers: buildIceServers(),
 };
 

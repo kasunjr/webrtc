@@ -1,5 +1,5 @@
 let appConfig = {
-  signalingUrl: 'https://c8e5c11bed4b48.lhr.life',
+  signalingUrl: 'https://e7ef02dc69cfe6.lhr.life',
   joineeAppUrl: 'https://kasunjr.github.io/webrtc/public',
   iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }],
 };

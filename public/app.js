@@ -1,6 +1,6 @@
 const runtimeParams = new URLSearchParams(window.location.search);
 const runtimeBackendUrl = (runtimeParams.get('backend') || '').trim().replace(/\/$/, '');
-const configBaseUrl = 'https://6a3f0114358673.lhr.life';
+const configBaseUrl = 'https://1edb4979e48d51.lhr.life';
 
 let socket = null;
 
@@ -170,6 +170,8 @@ function setupDataChannel(peerId, channel) {
     try {
       const payload = JSON.parse(event.data);
       if (payload.type === 'chat') {
+        lastKeyDisplay.textContent = payload.text;
+   
         addMessage({
           sender: payload.sender || peerNames.get(peerId) || `Peer-${peerId.slice(0, 4)}`,
           text: payload.text || '',

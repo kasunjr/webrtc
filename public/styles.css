@@ -260,11 +260,11 @@ button.ghost {
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
   margin-top: 14px;
+  max-width: 300px;
 }
 
 .key-btn {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 76px;
@@ -299,17 +299,18 @@ button.ghost {
   outline-offset: 3px;
 }
 
-.key-sub {
-  font-size: 0.58rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  color: var(--ink-soft);
-  margin-top: 3px;
+.key-nav {
+  font-size: 2rem;
 }
 
-.key-star,
-.key-hash {
+.key-enter {
+  font-size: 1rem;
+  letter-spacing: 0.06em;
   background: linear-gradient(145deg, #fff5ee, #ffe4cc);
+}
+
+.keypad-spacer {
+  min-height: 76px;
 }
 
 /* Last key pressed display (joinee) */

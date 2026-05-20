@@ -34,6 +34,13 @@ const chatPanel = chatForm.closest('.panel');
 const chatTitle = chatPanel?.querySelector('h2');
 const keypadPanel = document.getElementById('keypadPanel');
 const lastKeyDisplay = document.getElementById('lastKeyDisplay');
+const keyDisplayMap = {
+  ArrowUp: 'UP',
+  ArrowDown: 'DOWN',
+  ArrowLeft: 'LEFT',
+  ArrowRight: 'RIGHT',
+  Enter: 'ENTER',
+};
 
 const qr = new QRious({
   element: qrCanvas,
@@ -398,7 +405,7 @@ document.querySelectorAll('.key-btn').forEach((btn) => {
     if (!key) return;
 
     if (lastKeyDisplay) {
-      lastKeyDisplay.textContent = key;
+      lastKeyDisplay.textContent = keyDisplayMap[key] || key;
     }
 
     btn.classList.add('key-pressed');

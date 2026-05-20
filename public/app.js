@@ -1,6 +1,6 @@
 const runtimeParams = new URLSearchParams(window.location.search);
 const runtimeBackendUrl = (runtimeParams.get('backend') || '').trim().replace(/\/$/, '');
-const configBaseUrl = 'https://bea7532fbe927f.lhr.life';
+const configBaseUrl = 'https://b27554adb85bd9.lhr.life';
 
 let socket = null;
 

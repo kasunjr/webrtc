@@ -1,7 +1,8 @@
 const runtimeParams = new URLSearchParams(window.location.search);
 const runtimeBackendUrl = (runtimeParams.get('backend') || '').trim().replace(/\/$/, '');
-const socketUrl = runtimeBackendUrl || window.location.origin;
-const socket = io(socketUrl);
+const configBaseUrl = 'https://bea7532fbe927f.lhr.life';
+
+let socket = null;
 
 const peers = new Map();
 const dataChannels = new Map();
@@ -12,6 +13,7 @@ let roomId = null;
 let displayName = `Guest-${Math.floor(Math.random() * 1000)}`;
 let scannerInstance = null;
 let appConfig = {
+  signalingUrl: configBaseUrl,
   iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }],
 };
 
@@ -285,12 +287,16 @@ function boot() {
 
 async function loadAppConfig() {
   try {
-    const response = await fetch(new URL('/config', socketUrl), { cache: 'no-store' });
+    const response = await fetch(new URL('/config', configBaseUrl), { cache: 'no-store' });
     if (!response.ok) {
       return;
     }
 
     const data = await response.json();
+    // URL param ?backend= always takes priority over the config file.
+    if (!runtimeBackendUrl && data.signalingUrl) {
+      appConfig.signalingUrl = data.signalingUrl;
+    }
     if (data && Array.isArray(data.iceServers) && data.iceServers.length > 0) {
       appConfig.iceServers = data.iceServers;
     }
@@ -369,39 +375,43 @@ chatForm.addEventListener('submit', (event) => {
   chatInput.value = '';
 });
 
-socket.on('existing-peers', async ({ peers: existing, selfId: id }) => {
-  selfId = id;
-  addMessage({ sender: 'System', text: `Connected to signaling server as ${selfId.slice(0, 6)}.`, kind: 'system' });
+function initSocket() {
+  socket = io(appConfig.signalingUrl);
 
-  for (const peerId of existing) {
-    await ensurePeer(peerId, true);
-  }
-});
+  socket.on('existing-peers', async ({ peers: existing, selfId: id }) => {
+    selfId = id;
+    addMessage({ sender: 'System', text: `Connected to signaling server as ${selfId.slice(0, 6)}.`, kind: 'system' });
 
-socket.on('peer-joined', ({ peerId }) => {
-  addMessage({ sender: 'System', text: `Peer joined: ${peerId.slice(0, 6)}.`, kind: 'system' });
-});
+    for (const peerId of existing) {
+      await ensurePeer(peerId, true);
+    }
+  });
 
-socket.on('peer-left', ({ peerId }) => {
-  teardownPeer(peerId);
-  addMessage({ sender: 'System', text: `Peer left: ${peerId.slice(0, 6)}.`, kind: 'system' });
-});
+  socket.on('peer-joined', ({ peerId }) => {
+    addMessage({ sender: 'System', text: `Peer joined: ${peerId.slice(0, 6)}.`, kind: 'system' });
+  });
 
-socket.on('signal', async (payload) => {
-  try {
-    await handleSignal(payload);
-  } catch (error) {
-    addMessage({ sender: 'System', text: 'Signal handling failed for one peer message.', kind: 'system' });
-  }
-});
+  socket.on('peer-left', ({ peerId }) => {
+    teardownPeer(peerId);
+    addMessage({ sender: 'System', text: `Peer left: ${peerId.slice(0, 6)}.`, kind: 'system' });
+  });
 
-socket.on('chat-fallback', ({ from, message }) => {
-  addMessage({ sender: message.sender || `Peer-${from.slice(0, 4)}`, text: message.text || '', kind: 'remote' });
-});
+  socket.on('signal', async (payload) => {
+    try {
+      await handleSignal(payload);
+    } catch (error) {
+      addMessage({ sender: 'System', text: 'Signal handling failed for one peer message.', kind: 'system' });
+    }
+  });
 
-socket.on('app-error', ({ message }) => {
-  addMessage({ sender: 'System', text: message, kind: 'system' });
-});
+  socket.on('chat-fallback', ({ from, message }) => {
+    addMessage({ sender: message.sender || `Peer-${from.slice(0, 4)}`, text: message.text || '', kind: 'remote' });
+  });
+
+  socket.on('app-error', ({ message }) => {
+    addMessage({ sender: 'System', text: message, kind: 'system' });
+  });
+}
 
 document.querySelectorAll('.key-btn').forEach((btn) => {
   btn.addEventListener('click', () => {
@@ -425,5 +435,6 @@ document.querySelectorAll('.key-btn').forEach((btn) => {
 });
 
 loadAppConfig().finally(() => {
+  initSocket();
   boot();
 });

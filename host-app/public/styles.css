@@ -183,36 +183,6 @@ button.ghost {
   display: none;
 }
 
-/* Host kiosk mode: render only the QR canvas. */
-.qr-only .app-shell {
-  max-width: 360px;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.qr-only .panel-main,
-.qr-only .panel-chat,
-.qr-only #joinUrl,
-.qr-only #copyUrlBtn,
-.qr-only .panel-side h2,
-.qr-only .panel-side .subtitle {
-  display: none;
-}
-
-.qr-only .panel-side {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 24px;
-}
-
-.qr-only #qrCanvas {
-  max-width: 280px;
-}
-
 .messages {
   margin-top: 8px;
   min-height: 160px;

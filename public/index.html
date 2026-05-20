@@ -78,6 +78,25 @@
           <button type="submit">Send</button>
         </form>
       </section>
+
+      <section class="panel panel-keypad hidden" id="keypadPanel">
+        <h2>ADA Keypad</h2>
+        <div class="last-key-display" id="lastKeyDisplay" aria-live="polite" aria-atomic="true">—</div>
+        <div class="keypad" role="group" aria-label="ADA telephone keypad">
+          <button class="key-btn" data-key="1" aria-label="1">1</button>
+          <button class="key-btn" data-key="2" aria-label="2 ABC">2<span class="key-sub">ABC</span></button>
+          <button class="key-btn" data-key="3" aria-label="3 DEF">3<span class="key-sub">DEF</span></button>
+          <button class="key-btn" data-key="4" aria-label="4 GHI">4<span class="key-sub">GHI</span></button>
+          <button class="key-btn" data-key="5" aria-label="5 JKL">5<span class="key-sub">JKL</span></button>
+          <button class="key-btn" data-key="6" aria-label="6 MNO">6<span class="key-sub">MNO</span></button>
+          <button class="key-btn" data-key="7" aria-label="7 PQRS">7<span class="key-sub">PQRS</span></button>
+          <button class="key-btn" data-key="8" aria-label="8 TUV">8<span class="key-sub">TUV</span></button>
+          <button class="key-btn" data-key="9" aria-label="9 WXYZ">9<span class="key-sub">WXYZ</span></button>
+          <button class="key-btn key-star" data-key="*" aria-label="Star">*</button>
+          <button class="key-btn" data-key="0" aria-label="0">0</button>
+          <button class="key-btn key-hash" data-key="#" aria-label="Pound">#</button>
+        </div>
+      </section>
     </main>
 
     <script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>

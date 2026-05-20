@@ -1,7 +1,6 @@
 const runtimeParams = new URLSearchParams(window.location.search);
 const runtimeBackendUrl = (runtimeParams.get('backend') || '').trim().replace(/\/$/, '');
-//const socketUrl = runtimeBackendUrl || window.location.origin;
-const socketUrl = 'https://350c5e5ca668fd.lhr.life';
+const socketUrl = runtimeBackendUrl || window.location.origin;
 const socket = io(socketUrl);
 
 const peers = new Map();
@@ -29,6 +28,12 @@ const scannerWrap = document.getElementById('scannerWrap');
 const messagesEl = document.getElementById('messages');
 const chatForm = document.getElementById('chatForm');
 const chatInput = document.getElementById('chatInput');
+const mainPanel = createRoomBtn.closest('.panel');
+const qrPanel = qrCanvas.closest('.panel');
+const chatPanel = chatForm.closest('.panel');
+const chatTitle = chatPanel?.querySelector('h2');
+const keypadPanel = document.getElementById('keypadPanel');
+const lastKeyDisplay = document.getElementById('lastKeyDisplay');
 
 const qr = new QRious({
   element: qrCanvas,
@@ -82,6 +87,26 @@ function refreshQr() {
   qr.value = joinUrl;
 }
 
+function applyRoleLayout(isHost) {
+  // Host only needs the share QR view. Joiner only needs message composer.
+  mainPanel?.classList.add('hidden');
+
+  if (isHost) {
+    qrPanel?.classList.remove('hidden');
+    chatPanel?.classList.add('hidden');
+    scannerWrap.classList.add('hidden');
+    if (scannerInstance) {
+      scannerInstance.clear().catch(() => {});
+      scannerInstance = null;
+    }
+    return;
+  }
+
+  qrPanel?.classList.add('hidden');
+  chatPanel?.classList.add('hidden');
+  keypadPanel?.classList.remove('hidden');
+}
+
 function teardownPeer(peerId) {
   const peer = peers.get(peerId);
   if (peer) {
@@ -128,6 +153,7 @@ function setupDataChannel(peerId, channel) {
   };
 
   channel.onmessage = (event) => {
+    console.log('Received message from peer', peerId, event.data);
     try {
       const payload = JSON.parse(event.data);
       if (payload.type === 'chat') {
@@ -137,7 +163,8 @@ function setupDataChannel(peerId, channel) {
           kind: 'remote',
         });
       }
-    } catch {
+    } catch (error) {
+      console.error('Error parsing message from peer', peerId, event.data, error);
       addMessage({ sender: `Peer-${peerId.slice(0, 4)}`, text: event.data, kind: 'remote' });
     }
   };
@@ -206,7 +233,8 @@ async function handleSignal({ from, payload }) {
   if (payload.candidate) {
     try {
       await pc.addIceCandidate(payload.candidate);
-    } catch {
+    } catch (error) {
+      console.error('Error adding ICE candidate for peer', from, payload.candidate, error);
       // Ignore race conditions from early ICE candidates.
     }
   }
@@ -226,6 +254,7 @@ function enterRoom(nextRoomId, isHost) {
 
   roleLabel.textContent = isHost ? 'Device A (Host)' : 'Device B/C (Joiner)';
   roomLabel.textContent = roomId;
+  applyRoleLayout(isHost);
   refreshQr();
 
   socket.emit('join-room', { roomId, displayName });
@@ -350,7 +379,7 @@ socket.on('peer-left', ({ peerId }) => {
 socket.on('signal', async (payload) => {
   try {
     await handleSignal(payload);
-  } catch {
+  } catch (error) {
     addMessage({ sender: 'System', text: 'Signal handling failed for one peer message.', kind: 'system' });
   }
 });
@@ -361,6 +390,27 @@ socket.on('chat-fallback', ({ from, message }) => {
 
 socket.on('app-error', ({ message }) => {
   addMessage({ sender: 'System', text: message, kind: 'system' });
+});
+
+document.querySelectorAll('.key-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const key = btn.dataset.key;
+    if (!key) return;
+
+    if (lastKeyDisplay) {
+      lastKeyDisplay.textContent = key;
+    }
+
+    btn.classList.add('key-pressed');
+    setTimeout(() => btn.classList.remove('key-pressed'), 150);
+
+    broadcast({
+      type: 'keypress',
+      key,
+      sender: displayName,
+      ts: Date.now(),
+    });
+  });
 });
 
 loadAppConfig().finally(() => {

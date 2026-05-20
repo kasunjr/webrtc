@@ -95,8 +95,11 @@ function refreshQr() {
 }
 
 function applyRoleLayout(isHost) {
-  // Host only needs the share QR view. Joiner only needs message composer.
-  mainPanel?.classList.add('hidden');
+  // Always hide the hero controls; keep the status-grid visible for both roles.
+  mainPanel?.querySelector('.controls')?.classList.add('hidden');
+  mainPanel?.querySelector('.eyebrow')?.classList.add('hidden');
+  mainPanel?.querySelector('h1')?.classList.add('hidden');
+  mainPanel?.querySelector('.subtitle')?.classList.add('hidden');
 
   if (isHost) {
     qrPanel?.classList.remove('hidden');
@@ -109,6 +112,7 @@ function applyRoleLayout(isHost) {
     return;
   }
 
+  // Joinee: show status panel + keypad; hide QR and chat.
   qrPanel?.classList.add('hidden');
   chatPanel?.classList.add('hidden');
   keypadPanel?.classList.remove('hidden');

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebRTC Host</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-shape bg-one"></div>
+    <div class="bg-shape bg-two"></div>
+
+    <main class="app-shell">
+      <section class="panel panel-main">
+        <p class="eyebrow">Host App</p>
+        <h1>WebRTC Host</h1>
+        <p class="subtitle">Create a room and share the QR code with joinees.</p>
+
+        <div class="status-grid">
+          <div class="status-card">
+            <span>Room</span>
+            <strong id="roomLabel">-</strong>
+          </div>
+          <div class="status-card">
+            <span>Peers</span>
+            <strong id="peerCount">0</strong>
+          </div>
+          <div class="status-card">
+            <span>Signaling</span>
+            <strong id="signalingStatus">Connecting…</strong>
+          </div>
+        </div>
+
+        <div class="controls">
+          <label class="input-block">
+            Display Name
+            <input id="nameInput" type="text" maxlength="24" placeholder="Your name" />
+          </label>
+          <div class="row-buttons">
+            <button id="createRoomBtn" type="button">Create New Room</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel panel-side">
+        <h2>Share QR Code</h2>
+        <p class="subtitle" style="margin-bottom:12px;">Joinees scan this to join the room.</p>
+        <canvas id="qrCanvas" width="220" height="220" aria-label="Room QR code"></canvas>
+        <p id="joinUrl" class="mono"></p>
+        <button id="copyUrlBtn" type="button" class="ghost">Copy Join Link</button>
+      </section>
+
+      <section class="panel panel-chat">
+        <h2>Chat &amp; Keypad Input</h2>
+
+        <div class="last-key-panel">
+          <span class="last-key-label">Last Key</span>
+          <div id="lastKey" class="last-key-big" aria-live="polite" aria-atomic="true">—</div>
+          <span id="lastKeyFrom" class="last-key-from"></span>
+        </div>
+
+        <div id="messages" class="messages" aria-live="polite"></div>
+        <form id="chatForm" class="chat-form">
+          <input
+            id="chatInput"
+            type="text"
+            maxlength="500"
+            placeholder="Type a message and hit Enter"
+            autocomplete="off"
+          />
+          <button type="submit">Send</button>
+        </form>
+      </section>
+    </main>
+
+    <script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
